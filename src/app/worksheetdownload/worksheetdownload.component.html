@@ -1,0 +1,135 @@
+<app-nav></app-nav>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <span>
+      <li class="breadcrumb-item active" aria-current="page">
+        Worksheet Download
+      </li>
+    </span>
+    <li class="_date">
+      Logged in from {{ myDate | momentDate : "dddd, DD"
+      }}<sup>{{ myDate | momentDate : "D" | dateSuffix }}</sup>
+      {{ myDate | momentDate : "MMM yyyy, hh:mm A" }}
+    </li>
+  </ol>
+</nav>
+<div class="container-fluid">
+  <form [formGroup]="worksheetForm" (ngSubmit)="getWorksheetDownload()">
+    <h6 class="fs-1 mb-3">All Employees Download</h6>
+    <div class="row d-flex">
+      <!-- Report Type -->
+      <div class="col-md-3 d-flex align-items-center">
+        <label>Report Type <span class="important">*</span></label>
+        <select (change)="onReportTypeChange($event)" class="mx-2 payperiod">
+          <option value="yearwise" selected>Year Wise</option>
+          <option value="datewise">Date Wise</option>
+        </select>
+      </div>
+
+      <!-- Year and Month (visible only for Year Wise) -->
+      <div class="col-md-2 d-flex align-items-center" *ngIf="isYearWise">
+        <label for="year">Select Year<span class="important">*</span></label>
+        <select id="year" formControlName="year" class="mx-2 payperiod">
+          <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+        </select>
+      </div>
+
+      <div class="col-md-3 d-flex align-items-center" *ngIf="isYearWise">
+        <label for="month">Select Month<span class="important">*</span></label>
+        <select id="month" formControlName="month" class="mx-2 payperiod">
+          <option *ngFor="let mon of months" [value]="mon.id">
+            {{ mon.name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Date Range (visible only for Date Wise) -->
+      <div class="col-md-2 d-flex align-items-center" *ngIf="!isYearWise">
+        <label for="fromDate">From Date <span class="important">*</span></label>
+        <input
+          type="text"
+          class="mx-2 payperiod"
+          id="fromDate"
+          name="fromDate"
+          formControlName="fromDate"
+          autocomplete="off"
+          placeholder="YYYY-MM-DD"
+          [bsConfig]="{
+            adaptivePosition: true,
+            showWeekNumbers: false,
+            isAnimated: true,
+            containerClass: colorTheme,
+            customTodayClass: 'custom-today-class',
+            dateInputFormat: 'YYYY-MM-DD'
+          }"
+          bsDatepicker
+          required
+          readonly
+        />
+      </div>
+
+      <div class="col-md-2 d-flex align-items-center" *ngIf="!isYearWise">
+        <label for="toDate">To Date <span class="important">*</span></label>
+        <input
+          type="text"
+          class="mx-2 payperiod"
+          id="toDate"
+          name="toDate"
+          formControlName="toDate"
+          autocomplete="off"
+          placeholder="YYYY-MM-DD"
+          [bsConfig]="{
+            adaptivePosition: true,
+            showWeekNumbers: false,
+            isAnimated: true,
+            containerClass: colorTheme,
+            customTodayClass: 'custom-today-class',
+            dateInputFormat: 'YYYY-MM-DD'
+          }"
+          bsDatepicker
+          required
+          readonly
+        />
+      </div>
+
+      <!-- Submit and Self Download buttons -->
+      <div class="col-md-4 d-flex justify-content-start align-items-center">
+        <button type="submit" class="btn download">Download Report</button>
+        <button
+          type="button"
+          class="btn download"
+          (click)="selfDownload($event)"
+        >
+          Self Download
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="file-upload-loader" *ngIf="isUploading">
+  <img src="assets/spinner.gif" alt="Loading..." />
+  <p>Please wait, the download may take a few minutes.</p>
+</div>
+<div class="container-fluid mt-3">
+  <div class="myTableScroll">
+    <table class="table table-striped auto-width-table">
+      <thead class="table-light sticky-header">
+        <tr>
+          <th>EmpID</th>
+          <th>Employee Name</th>
+          <th>Team</th>
+          <th>Employee Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let emp of employeeData">
+          <td>{{ emp.empId }}</td>
+          <td>{{ emp.name }}</td>
+          <td>{{ emp.team }}</td>
+          <td>{{ emp.type }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
